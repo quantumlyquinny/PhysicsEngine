@@ -1,0 +1,18 @@
+# CMake build folders
+build/
+out/
+.cmake/
+CMakeCache.txt
+CMakeFiles/
+
+# Compiled executables and binaries
+*.exe
+*.dll
+*.lib
+*.so
+*.dylib
+*.o
+*.obj
+
+# VS Code IDE settings
+.vscode/
