@@ -40,7 +40,7 @@ private:
     // --- Systems (owned, initialized once) ---
     std::unique_ptr<Integrator>  m_integrator;
     std::unique_ptr<BroadPhase>  m_broadPhase;
-    std::unique_ptr<NarrowPhase> m_narrowPhase;
+//    std::unique_ptr<NarrowPhase> m_narrowPhase;
 
     void solveConstraints(const std::vector<Manifold>& manifolds, float dt);
     void updateSleepState(float dt);

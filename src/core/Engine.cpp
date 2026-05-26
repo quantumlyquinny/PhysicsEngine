@@ -38,7 +38,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* title)
 
     // --- Allocate systems (pre-allocate their internal pools here) ---
     m_world    = std::make_unique<PhysicsWorld>();
-    m_renderer = std::make_unique<Renderer>(width, height);
+    //m_renderer = std::make_unique<Renderer>(width, height);
     m_timer    = std::make_unique<Timer>();
 
     m_world->setGravity(glm::vec3(0.0f, -9.81f, 0.0f));
@@ -97,7 +97,7 @@ void Engine::processInput() {
             m_running = false;
         if (event.type == sf::Event::Resized) {
             glViewport(0, 0, event.size.width, event.size.height);
-            m_renderer->onResize(event.size.width, event.size.height);
+//          m_renderer->onResize(event.size.width, event.size.height);
         }
         // Forward to camera controller, debug UI, etc. in later steps
     }
@@ -113,10 +113,10 @@ void Engine::render() {
     glClearColor(0.08f, 0.08f, 0.12f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    m_renderer->beginFrame();
-    m_renderer->drawBodies(m_world->getBodies());
-    m_renderer->drawDebugOverlay(); // AABB wireframes, contact normals
-    m_renderer->endFrame();
+    //m_renderer->beginFrame();
+    //m_renderer->drawBodies(m_world->getBodies());
+    //m_renderer->drawDebugOverlay(); // AABB wireframes, contact normals
+    //m_renderer->endFrame();
 
     m_window.display();
 }

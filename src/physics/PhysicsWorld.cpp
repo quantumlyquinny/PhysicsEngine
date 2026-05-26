@@ -1,6 +1,7 @@
 #include "PhysicsWorld.hpp"
 #include "Integrator.hpp"
 #include "../core/Timer.hpp"
+#include "BroadPhase.hpp"
 
 PhysicsWorld::PhysicsWorld() {
     // ── Pre-allocate all body storage upfront ─────────────────────────────
@@ -10,8 +11,8 @@ PhysicsWorld::PhysicsWorld() {
     m_freeList.reserve(MAX_BODIES);
 
     m_integrator  = std::make_unique<Integrator>();
-    m_broadPhase  = std::make_unique<BroadPhase>();   // Step 3
-    m_narrowPhase = std::make_unique<NarrowPhase>();  // Step 4
+    m_broadPhase  = std::make_unique<BroadPhase>(MAX_BODIES);// Step 3
+// m_narrowPhase = std::make_unique<NarrowPhase>();  // Step 4
 }
 
 PhysicsWorld::~PhysicsWorld() = default;
@@ -108,8 +109,8 @@ void PhysicsWorld::step(float dt) {
     // Queries the Octree; fills m_candidatePairs with (BodyID, BodyID).
     // O(n log n) vs the O(n²) brute-force alternative.
     // STUB — implemented in Step 3.
-    //m_broadPhase->update(m_bodies, dt);
-    //const auto& candidatePairs = m_broadPhase->getCandidatePairs();
+    m_broadPhase->update(m_bodies, dt);
+    const auto& candidatePairs = m_broadPhase->getCandidatePairs();
 
     // ── Stage 5: Narrow Phase — GJK + EPA per candidate pair ─────────────
     // For each pair: runs GJK (boolean), then EPA (contact manifold).

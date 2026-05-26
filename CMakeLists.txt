@@ -3,6 +3,7 @@ project(PhysicsEngine)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
 # 1. Fetch SFML automatically from GitHub
 include(FetchContent)

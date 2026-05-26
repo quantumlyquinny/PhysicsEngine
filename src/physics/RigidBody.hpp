@@ -24,6 +24,7 @@ struct RigidBodyState {
     glm::quat renderOrientation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 };
 
+
 struct RigidBodyProperties {
     float     inverseMass              = 1.0f;   // 0.0f → infinite mass (static)
     glm::mat3 inverseInertiaTensorBody = glm::mat3(1.0f); // body-space, constant
@@ -31,6 +32,11 @@ struct RigidBodyProperties {
     float     linearDamping            = 0.005f; // small — corrects Verlet drift
     float     angularDamping           = 0.005f;
     float     friction                 = 0.4f;
+    
+    // Conservative bounding sphere radius.
+    // Must enclose the body's entire collision geometry.
+    // Step 4 will derive this from the convex hull; set manually for now.
+    float     boundingRadius           = 1.0f;
 };
 
 struct RigidBodyForces {
