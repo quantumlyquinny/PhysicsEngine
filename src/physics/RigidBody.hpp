@@ -5,7 +5,9 @@
 
 using BodyID = std::uint32_t;
 static constexpr BodyID INVALID_BODY_ID = 0xFFFFFFFF;
+class IConvexShape;
 
+#include <memory>
 struct RigidBodyState {
     // ── Linear (Verlet: two positions, no explicit velocity) ──────────────
     glm::vec3 position        = glm::vec3(0.0f);
@@ -55,7 +57,7 @@ public:
     bool                isStatic   = false;
     bool                isSleeping = false;
     float               sleepTimer = 0.0f;
-
+    std::shared_ptr<IConvexShape> collisionShape;
     // ── Force application helpers ─────────────────────────────────────────
     void applyForce(const glm::vec3& force);
 

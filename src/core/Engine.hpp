@@ -25,7 +25,7 @@ private:
 
     sf::Window          m_window;
     std::unique_ptr<PhysicsWorld> m_world;
-//  std::unique_ptr<Renderer>     m_renderer;
+    std::unique_ptr<Renderer>     m_renderer;
     std::unique_ptr<Timer>        m_timer;
 
     bool m_running = false;

@@ -2,6 +2,7 @@
 #include "Timer.hpp"
 #include "../physics/PhysicsWorld.hpp"
 #include "../renderer/Renderer.hpp"
+#include "../physics/RigidBodyFactory.hpp" // <--- ADD THIS
 
 // GLAD must be included before any OpenGL header
 #include <glad/glad.h>
@@ -33,15 +34,40 @@ Engine::Engine(unsigned int width, unsigned int height, const char* title)
 
     glViewport(0, 0, static_cast<int>(width), static_cast<int>(height));
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
 
     // --- Allocate systems (pre-allocate their internal pools here) ---
     m_world    = std::make_unique<PhysicsWorld>();
-    //m_renderer = std::make_unique<Renderer>(width, height);
+    m_renderer = std::make_unique<Renderer>(width, height); // <--- UNCOMMENTED
     m_timer    = std::make_unique<Timer>();
 
     m_world->setGravity(glm::vec3(0.0f, -9.81f, 0.0f));
+
+    // --- SPAWN THE TEST SCENE ---
+    const auto addBody = [&](RigidBodyFactory::BodyBlueprint&& bp, bool isStatic = false) {
+        BodyID id = m_world->createBody(bp.state, bp.properties, isStatic);
+        m_world->setCollisionShape(id, std::move(bp.shape));
+        return id;
+    };
+
+    // Spawn a massive static floor (2m thick, 20m wide)
+    addBody(RigidBodyFactory::makeStaticBox({0.0f, -1.0f, 0.0f}, {10.0f, 1.0f, 10.0f}), true);
+
+    // Spawn a towering stack of 8 dynamic cubes
+    // Spawn 5 tumbling cubes
+    for (int i = 0; i < 5; i++) {
+        // Add a tiny offset to X and Z so they hit each other's corners and tumble
+        float offsetX = (i % 2 == 0) ? 0.2f : -0.1f;
+        float offsetZ = (i % 3 == 0) ? 0.1f : -0.2f;
+        
+        addBody(RigidBodyFactory::makeBox(
+            glm::vec3(offsetX, 2.0f + (i * 2.5f), offsetZ), 
+            glm::vec3(0.5f),                          
+            5.0f                                      
+        ));
+    }
+
     m_running = true;
 }
 
@@ -113,10 +139,10 @@ void Engine::render() {
     glClearColor(0.08f, 0.08f, 0.12f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //m_renderer->beginFrame();
-    //m_renderer->drawBodies(m_world->getBodies());
+    m_renderer->beginFrame();
+    m_renderer->drawBodies(m_world->getBodies());
     //m_renderer->drawDebugOverlay(); // AABB wireframes, contact normals
-    //m_renderer->endFrame();
+    m_renderer->endFrame();
 
     m_window.display();
 }

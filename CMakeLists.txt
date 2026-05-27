@@ -30,4 +30,9 @@ target_include_directories(PhysicsEngine PRIVATE
 )
 
 # 6. Link the SFML libraries to the engine
-target_link_libraries(PhysicsEngine PRIVATE sfml-window sfml-system sfml-graphics)
+target_link_libraries(PhysicsEngine PRIVATE 
+    sfml-graphics 
+    sfml-window 
+    sfml-system 
+    sfml-main
+)

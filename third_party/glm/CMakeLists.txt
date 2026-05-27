@@ -1,69 +1,39 @@
-file(GLOB ROOT_SOURCE *.cpp)
-file(GLOB ROOT_INLINE *.inl)
-file(GLOB ROOT_HEADER *.hpp)
-file(GLOB ROOT_TEXT ../*.txt)
-file(GLOB ROOT_MD ../*.md)
-file(GLOB ROOT_NAT ../util/glm.natvis)
+cmake_minimum_required(VERSION 3.15)
+project(PhysicsEngine)
 
-file(GLOB_RECURSE CORE_SOURCE ./detail/*.cpp)
-file(GLOB_RECURSE CORE_INLINE ./detail/*.inl)
-file(GLOB_RECURSE CORE_HEADER ./detail/*.hpp)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
-file(GLOB_RECURSE EXT_SOURCE ./ext/*.cpp)
-file(GLOB_RECURSE EXT_INLINE ./ext/*.inl)
-file(GLOB_RECURSE EXT_HEADER ./ext/*.hpp)
+# 1. Fetch SFML automatically from GitHub
+include(FetchContent)
+FetchContent_Declare(
+    SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 2.6.1
+)
+FetchContent_MakeAvailable(SFML)
 
-file(GLOB_RECURSE GTC_SOURCE ./gtc/*.cpp)
-file(GLOB_RECURSE GTC_INLINE ./gtc/*.inl)
-file(GLOB_RECURSE GTC_HEADER ./gtc/*.hpp)
+# 2. Automatically find all your .cpp files in the src folder
+file(GLOB_RECURSE ENGINE_SOURCES "src/*.cpp")
 
-file(GLOB_RECURSE GTX_SOURCE ./gtx/*.cpp)
-file(GLOB_RECURSE GTX_INLINE ./gtx/*.inl)
-file(GLOB_RECURSE GTX_HEADER ./gtx/*.hpp)
+# 3. Add the GLAD C-file
+set(GLAD_SOURCE "third_party/glad/src/glad.c")
 
-file(GLOB_RECURSE SIMD_SOURCE ./simd/*.cpp)
-file(GLOB_RECURSE SIMD_INLINE ./simd/*.inl)
-file(GLOB_RECURSE SIMD_HEADER ./simd/*.h)
+# 4. Create the main Engine executable
+add_executable(PhysicsEngine ${ENGINE_SOURCES} ${GLAD_SOURCE})
+set_target_properties(PhysicsEngine PROPERTIES WIN32_EXECUTABLE FALSE) # <--- ADDED THIS LINE
 
-source_group("Text Files" FILES ${ROOT_TEXT} ${ROOT_MD})
-source_group("Core Files" FILES ${CORE_SOURCE})
-source_group("Core Files" FILES ${CORE_INLINE})
-source_group("Core Files" FILES ${CORE_HEADER})
-source_group("EXT Files" FILES ${EXT_SOURCE})
-source_group("EXT Files" FILES ${EXT_INLINE})
-source_group("EXT Files" FILES ${EXT_HEADER})
-source_group("GTC Files" FILES ${GTC_SOURCE})
-source_group("GTC Files" FILES ${GTC_INLINE})
-source_group("GTC Files" FILES ${GTC_HEADER})
-source_group("GTX Files" FILES ${GTX_SOURCE})
-source_group("GTX Files" FILES ${GTX_INLINE})
-source_group("GTX Files" FILES ${GTX_HEADER})
-source_group("SIMD Files" FILES ${SIMD_SOURCE})
-source_group("SIMD Files" FILES ${SIMD_INLINE})
-source_group("SIMD Files" FILES ${SIMD_HEADER})
-
-add_library(glm-header-only INTERFACE)
-add_library(glm::glm-header-only ALIAS glm-header-only)
-
-target_include_directories(glm-header-only INTERFACE
-	"$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>"
-	"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+# 5. Tell the compiler where your GLAD and GLM folders are
+target_include_directories(PhysicsEngine PRIVATE 
+    "third_party/glad/include"
+    "third_party" 
 )
 
-if (GLM_BUILD_LIBRARY)
-	add_library(glm
-		${ROOT_TEXT}      ${ROOT_MD}        ${ROOT_NAT}
-		${ROOT_SOURCE}    ${ROOT_INLINE}    ${ROOT_HEADER}
-		${CORE_SOURCE}    ${CORE_INLINE}    ${CORE_HEADER}
-		${EXT_SOURCE}     ${EXT_INLINE}     ${EXT_HEADER}
-		${GTC_SOURCE}     ${GTC_INLINE}     ${GTC_HEADER}
-		${GTX_SOURCE}     ${GTX_INLINE}     ${GTX_HEADER}
-		${SIMD_SOURCE}    ${SIMD_INLINE}    ${SIMD_HEADER}
-	)
-	add_library(glm::glm ALIAS glm)
-	target_link_libraries(glm PUBLIC glm-header-only)
-else()
-	add_library(glm INTERFACE)
-	add_library(glm::glm ALIAS glm)
-	target_link_libraries(glm INTERFACE glm-header-only)
-endif()
+# 6. Link the SFML libraries to the engine
+target_link_libraries(PhysicsEngine PRIVATE 
+    sfml-graphics 
+    sfml-window 
+    sfml-system 
+    sfml-main
+)
